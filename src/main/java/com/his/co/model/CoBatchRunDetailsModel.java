@@ -3,18 +3,19 @@
  */
 package com.his.co.model;
 
-import java.sql.Date;
+import java.util.Date;
+
+import lombok.Data;
 
 /**
  * @author vinay
  *
  */
+@Data
 public class CoBatchRunDetailsModel {
-	Integer batchRunId;
-	String batchName;
-	Date startDate;
-	Date startTime;
-	Date endDate;
-	Date endTime;
-
-}//CoBatchRunDetailsModel 
+	private Integer runSeq;
+	private String batchName;
+	private Date startDate;
+	private Date endDate;
+	private String batchRunStatus;
+}// CoBatchRunDetailsModel

@@ -22,11 +22,11 @@ public class CoBatchSummaryEntity {
 	@GeneratedValue
 	@Column(name="SUMMARY_ID")
 	private Integer  summaryId;
-	@Column(name="BATCH_NAME")
+	@Column(name = "BATCH_NAME")
 	String batchName;
-	@Column(name="TOTAL_TRIGGER_PROCESSED")
+	@Column(name = "TOTAL_TRIGGER_PROCESSED")
 	Integer totalTriggerProcessed;
-	@Column(name="FAILURE_TRIGGER_COUNT")
+	@Column(name = "FAILURE_TRIGGER_COUNT")
 	Integer failureTriggerCount;
 	@Column(name="SUCCESS_TRIGGER_COUNT")
 	Integer successTriggerCount;

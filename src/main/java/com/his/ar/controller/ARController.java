@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.his.ar.entity.ARUserMaster;
 import com.his.ar.model.UserMaster;
 import com.his.ar.service.ARService;
+import com.his.co.batches.CoPlanReportDlyBatch;
 import com.his.util.AppConstants;
 
 /**
@@ -32,7 +33,16 @@ import com.his.util.AppConstants;
 public class ARController {
 
 	@Autowired
+	private CoPlanReportDlyBatch batch;
+
+	@Autowired
 	private ARService arService;
+
+	@RequestMapping({ "/batchTest" })
+	public String batchTest() {
+		batch.init();
+		return "index";
+	}
 
 	/**
 	 * this is used for home page and login page(admin / case worker)

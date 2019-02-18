@@ -20,21 +20,20 @@ import lombok.Data;
 
 @Data()
 @Entity()
-@Table(name="BATCH_RUN_DETAILS")
+@Table(name = "CO_BATCH_RUN_DTLS")
 public class CoBatchRunDetailsEntity {
 	@Id()
 	@GeneratedValue
-	@Column(name="BATCH_RUN_ID")
-	Integer batchRunId;
-	@Column(name="BATCH_NAME")
+	@Column(name = "BATCH_RUN_SEQ")
+	Integer runSeq;
+	@Column(name = "BATCH_NAME")
 	String batchName;
-	@Column(name="START_DATE")
+	@Column(name = "START_DATE")
 	Date startDate;
-	@Column(name="START_TIME")
-	Date startTime;
-	@Column(name="END_DATE")
-	Date endDate;
-	@Column(name="END_TIME")
+	@Column(name = "END_DATE")
 	Date endTime;
 
-}//CoBatchRunDetailsEntity
+	@Column(name = "BATCH_RUN_STATUS")
+	private String batchRunStatus;
+
+}// CoBatchRunDetailsEntity

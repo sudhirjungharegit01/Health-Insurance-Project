@@ -18,8 +18,10 @@ import com.his.ar.model.UserMaster;
 import com.his.util.AppConstants;
 import com.his.util.EmailService;
 import com.his.util.PasswordService;
+
 /***
  * this class is used to business operation in the case worker
+ * 
  * @author Nitish
  *
  */
@@ -68,31 +70,32 @@ public class ARServiceImpl implements ARService {
 		return um;
 	}
 
-/***
- *
- * this method is used to login case worker when the case worker user is activated
- */
+	/***
+	 *
+	 * this method is used to login case worker when the case worker user is
+	 * activated
+	 */
 	@Override
 	public UserMaster findUserByEmailAndPwd(String email, String pwd) {
 		UserMaster um = null;
 		String encryptedPwd = PasswordService.encrypt(pwd);
 		ARUserMaster arUserMaster = arUserMasterDao.findUserByEmailAndPwd(email, encryptedPwd);
-	if(arUserMaster!=null)
-	{
-		um=new UserMaster();
-		BeanUtils.copyProperties(arUserMaster, um);
-	
-	}
-		
-	
+		if (arUserMaster != null) {
+			um = new UserMaster();
+			BeanUtils.copyProperties(arUserMaster, um);
+
+		}
+
 		return um;
 	}
- /**
-  * this method is used to registered for case worker with send email body 
-  * @param um
-  * @return
-  * @throws Exception
-  */
+
+	/**
+	 * this method is used to registered for case worker with send email body
+	 * 
+	 * @param um
+	 * @return
+	 * @throws Exception
+	 */
 	public String getRegEmailBody(UserMaster um) throws Exception {
 		String fileName = "Registration_Email_Template.txt";
 		FileReader fr = new FileReader(fileName);
@@ -111,7 +114,8 @@ public class ARServiceImpl implements ARService {
 			}
 
 			if (line.contains("APP_URL")) {
-				line = line.replace("APP_URL", "<a href='http://localhost:2019/his'>Rhode Island Health Insurance System</a>");
+				line = line.replace("APP_URL",
+						"<a href='http://localhost:2019/his'>Rhode Island Health Insurance System</a>");
 			}
 
 			if (line.contains("APP_USER_PWD")) {
@@ -131,23 +135,22 @@ public class ARServiceImpl implements ARService {
 		// Returning mail body content
 		return mailBody.toString();
 	}
-/**
- * this method is use to check duplicate email id
- */
+
+	/**
+	 * this method is use to check duplicate email id
+	 */
 	@Override
 	public UserMaster findByEmail(String email) {
-		UserMaster um=null;
-		ARUserMaster entity= arUserMasterDao.findByEmail(email);
-		if(entity!=null)
-		{
-			um=new UserMaster();
-			
+		UserMaster um = null;
+		ARUserMaster entity = arUserMasterDao.findByEmail(email);
+		if (entity != null) {
+			um = new UserMaster();
+
 			BeanUtils.copyProperties(entity, um);
-		
-		if(AppConstants.ACTIVE.equals(entity.getActiveSw()))
-		{
-			um.setPwd(PasswordService.decrypt(entity.getPwd()));
-			
+
+			if (AppConstants.ACTIVE.equals(entity.getActiveSw())) {
+				um.setPwd(PasswordService.decrypt(entity.getPwd()));
+
 				String text;
 				try {
 					text = getPassEmailBody(um);
@@ -155,15 +158,15 @@ public class ARServiceImpl implements ARService {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-		}
+			}
 		}
 		return um;
 	}
 
-
-
 	/***
-	 * this method is used to sent email body when the case worker has been forget the password
+	 * this method is used to sent email body when the case worker has been forget
+	 * the password
+	 * 
 	 * @param um
 	 * @return
 	 * @throws Exception
@@ -182,7 +185,8 @@ public class ARServiceImpl implements ARService {
 			}
 
 			if (line.contains("APP_URL")) {
-				line = line.replace("APP_URL", "<a href='http://localhost:2019/his'>Rhode Island Health Insurance System</a>");
+				line = line.replace("APP_URL",
+						"<a href='http://localhost:2019/his'>Rhode Island Health Insurance System</a>");
 			}
 
 			if (line.contains("APP_USER_PWD")) {
@@ -201,20 +205,21 @@ public class ARServiceImpl implements ARService {
 
 		// Returning mail body content
 		return mailBody.toString();
-		
+
 		/**
 		 * this method is used to all the records from db using pagination
 		 */
 	}
+
 	@Override
 	public Page<ARUserMaster> findAllUsers(int pageNo, int pageSize) {
 		Pageable pageble = new PageRequest(pageNo, pageSize);
 		List<UserMaster> users = new ArrayList<UserMaster>();
 		Page<ARUserMaster> pages = arUserMasterDao.findAll(pageble);
 		return pages;
-		
-		
+
 	}
+
 	/**
 	 * This method is used to fetch CW record using userid
 	 */
@@ -226,12 +231,12 @@ public class ARServiceImpl implements ARService {
 		return model;
 	}
 
-/**
- * this method is used to all the use from db
- */
+	/**
+	 * this method is used to all the use from db
+	 */
 	@Override
 	public List<UserMaster> findAllUsers() {
-		
+
 		List<UserMaster> users = new ArrayList<UserMaster>();
 		List<ARUserMaster> entities = arUserMasterDao.findAll();
 		for (ARUserMaster entity : entities) {
@@ -241,38 +246,37 @@ public class ARServiceImpl implements ARService {
 		}
 		return users;
 	}
-/**
- * this method is used to case worker edit the profiles 
- */
-@Override
-public UserMaster findByIdEdit(int cid) {
-	ARUserMaster entity = arUserMasterDao.findById(cid).get();
-	UserMaster model = new UserMaster();
 
-	BeanUtils.copyProperties(entity, model);
-	model.setPwd(PasswordService.decrypt(entity.getPwd()));
-	return model;
-}
+	/**
+	 * this method is used to case worker edit the profiles
+	 */
+	@Override
+	public UserMaster findByIdEdit(int cid) {
+		ARUserMaster entity = arUserMasterDao.findById(cid).get();
+		UserMaster model = new UserMaster();
 
-@Override
-public UserMaster saveUserUpadte(UserMaster um,boolean flage) {
-	ARUserMaster entity = new ARUserMaster();
-	um.setUpdatedBy(AppConstants.ROLE);
-	// copying data from model to entity
-	BeanUtils.copyProperties(um, entity);
-
-	// Encrypting User Password
-	if(flage!=false)
-	{
-	String encryptedPwd = PasswordService.encrypt(um.getPwd());
-	entity.setPwd(encryptedPwd);
+		BeanUtils.copyProperties(entity, model);
+		model.setPwd(PasswordService.decrypt(entity.getPwd()));
+		return model;
 	}
-	ARUserMaster savedEntity = arUserMasterDao.save(entity);
 
-	um.setUserId(savedEntity.getUserId());
+	@Override
+	public UserMaster saveUserUpadte(UserMaster um, boolean flage) {
+		ARUserMaster entity = new ARUserMaster();
+		um.setUpdatedBy(AppConstants.ROLE);
+		// copying data from model to entity
+		BeanUtils.copyProperties(um, entity);
 
-	return um;
-}
+		// Encrypting User Password
+		if (flage != false) {
+			String encryptedPwd = PasswordService.encrypt(um.getPwd());
+			entity.setPwd(encryptedPwd);
+		}
+		ARUserMaster savedEntity = arUserMasterDao.save(entity);
 
+		um.setUserId(savedEntity.getUserId());
+
+		return um;
+	}
 
 }

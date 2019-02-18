@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.his.co.entity.CoBatchSummaryEntity;
 
-@Repository("batchSummaryRepo")
+@Repository("coBatchSummaryRepo")
 public interface CoBatchSummaryRepository extends JpaRepository<CoBatchSummaryEntity, Serializable> {
 
 }// CoBatchSummaryRepository

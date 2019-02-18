@@ -1,10 +1,14 @@
 package com.his.co.batches;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.his.co.model.CoBatchRunDetailsModel;
 import com.his.co.model.CoBatchSummaryModel;
 import com.his.co.model.CoTriggersModel;
 import com.his.co.service.CoTriggersService;
+import com.his.co.service.CoTriggersServiceImpl;
 
 /**
  * This is class is used to define all co batches functionality
@@ -13,7 +17,7 @@ import com.his.co.service.CoTriggersService;
  *
  */
 public abstract class CoAbstractBatch {
-	@Autowired()
+	@Autowired
 	CoTriggersService coTrgService;
 
 	/**
@@ -22,7 +26,12 @@ public abstract class CoAbstractBatch {
 	 * @param batchName
 	 */
 	public void preProcess(String batchName) {
-		// Logic
+		CoBatchRunDetailsModel model = new CoBatchRunDetailsModel();
+		model.setBatchName(batchName);
+		model.setBatchRunStatus("ST");
+		model.setStartDate(new Date());
+		//coTrgService=new CoTriggersServiceImpl();
+		coTrgService.saveBatchRunDetails(model);
 	}
 
 	/**
@@ -34,15 +43,15 @@ public abstract class CoAbstractBatch {
 	 * @param failureCnt
 	 */
 	public void postProcess(String batchName, Integer totalTrggers, Integer succssCnt, Integer failureCnt) {
-		CoBatchSummaryModel model=null;
-		model=new CoBatchSummaryModel();
+		CoBatchSummaryModel model = null;
+		model = new CoBatchSummaryModel();
 		model.setBatchName(batchName);
 		model.setTotalTriggerProcessed(totalTrggers);
 		model.setSuccessTriggerCount(succssCnt);
 		model.setFailureTriggerCount(failureCnt);
-		//update batch summary
+		// update batch summary
 		coTrgService.saveBatchSummary(model);
-		
+
 	}
 
 	/**
@@ -55,5 +64,5 @@ public abstract class CoAbstractBatch {
 	 * 
 	 * @param model
 	 */
-	public abstract void process(CoTriggersModel model);
+	public abstract void process(CoTriggersModel model) throws Exception;
 }

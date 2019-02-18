@@ -11,8 +11,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.Data;
+
 /**
  * this is used for mapping in AR_USER_MASTER
+ * 
  * @author Nitish
  *
  */
