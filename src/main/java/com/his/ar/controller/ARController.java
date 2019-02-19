@@ -40,6 +40,7 @@ public class ARController {
 
 	@RequestMapping({ "/batchTest" })
 	public String batchTest() {
+		System.out.println("ARController.batchTest()");
 		batch.init();
 		return "index";
 	}

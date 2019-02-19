@@ -19,6 +19,6 @@ import com.his.co.entity.CoTriggersEntity;
 @Repository("coTrgRepository")
 public interface CoTriggersRepository extends JpaRepository<CoTriggersEntity, Serializable> {
 
-	@Query(name = "FROM CoTriggersEntity where triggerStatus=:status")
+	@Query(name = " FROM CoTriggersEntity where triggerStatus=:status")
 	public List<CoTriggersEntity> findByTriggerStatus(String status);
 }

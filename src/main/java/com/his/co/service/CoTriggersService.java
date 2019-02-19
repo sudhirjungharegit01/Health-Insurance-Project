@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.his.co.model.CoBatchRunDetailsModel;
 import com.his.co.model.CoBatchSummaryModel;
+import com.his.co.model.CoPdfModel;
 import com.his.co.model.CoTriggersModel;
 
 public interface CoTriggersService {
@@ -15,5 +16,6 @@ public interface CoTriggersService {
 	public CoBatchSummaryModel saveBatchSummary(CoBatchSummaryModel model);
 
 	public CoBatchRunDetailsModel saveBatchRunDetails(CoBatchRunDetailsModel model);
+	public CoPdfModel savePdf(CoPdfModel model);
 
 }

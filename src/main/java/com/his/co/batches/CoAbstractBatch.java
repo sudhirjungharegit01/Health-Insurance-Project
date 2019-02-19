@@ -9,6 +9,7 @@ import com.his.co.model.CoBatchSummaryModel;
 import com.his.co.model.CoTriggersModel;
 import com.his.co.service.CoTriggersService;
 import com.his.co.service.CoTriggersServiceImpl;
+import com.his.util.AppConstants;
 
 /**
  * This is class is used to define all co batches functionality
@@ -28,7 +29,7 @@ public abstract class CoAbstractBatch {
 	public void preProcess(String batchName) {
 		CoBatchRunDetailsModel model = new CoBatchRunDetailsModel();
 		model.setBatchName(batchName);
-		model.setBatchRunStatus("ST");
+		model.setBatchRunStatus(AppConstants.BATCH_RUN_STATUS);
 		model.setStartDate(new Date());
 		//coTrgService=new CoTriggersServiceImpl();
 		coTrgService.saveBatchRunDetails(model);

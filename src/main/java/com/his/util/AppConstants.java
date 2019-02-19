@@ -45,5 +45,7 @@ public class AppConstants {
 
 	public static final String PENDING_STATUS = "P";
 	public static final String COMPLETED_STATUS = "C";
+	public static final  String BATCH_RUN_STATUS="STARTED";
+	public static final String CASE_PLAN_STATUS="AP";
 
 }

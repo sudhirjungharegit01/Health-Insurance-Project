@@ -2,15 +2,19 @@ package com.his.co.batches;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import com.his.co.model.CoPdfModel;
 import com.his.co.model.CoTriggersModel;
 import com.his.co.service.CoTriggersService;
 import com.his.ed.model.EligibilityDetailModel;
 import com.his.ed.service.EligibilityDetailService;
+import com.his.util.AppConstants;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -24,9 +28,9 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 
 	private static final String BATH_NAME = "PLAN_RPRT_DLY";
 
-	private static Integer TOTAL_TRGS = null;
-	private static Integer SUCCESS_TRGS = null;
-	private static Integer FAILURE_TRGS = null;
+	private static Integer TOTAL_TRGS = 0;
+	private static Integer SUCCESS_TRGS = 0;
+	private static Integer FAILURE_TRGS = 0;
 
 	public void init() {
 		preProcess(BATH_NAME);
@@ -51,20 +55,36 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 	 * This method is used to process each trigger
 	 */
 	@Override
-	public void process(CoTriggersModel coTrgModel) throws Exception {
+	public void process(CoTriggersModel coTrgModel)  {
 		EligibilityDetailModel edModel = edService.findByCaseNum(coTrgModel.getCaseNum());
 
 		if (null != edModel) {
 			String planStatus = edModel.getPlanStatus();
 
-			if (planStatus.equals("AP")) {
+			if (planStatus.equals(AppConstants.CASE_PLAN_STATUS)) {
+				System.out.println("success");
 				// generate approved pdf
-				// buildPlanApPdf(edModel);
+				try {
+					buildPlanApPdf(edModel);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (DocumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} else {
 				// generate denied pdf
-				buildPlanDnPdf(edModel);
+				System.out.println("denied");
+				try {
+					buildPlanDnPdf(edModel);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			// store that pdf in db
+			storePdf(edModel);
 			// send that pdf to email
 			updatePendingTrigger(coTrgModel);
 		}
@@ -106,7 +126,7 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 	public void buildPlanApPdf(EligibilityDetailModel edModel) throws FileNotFoundException, DocumentException {
 
 		Document document = new Document();
-		PdfWriter.getInstance(document, new FileOutputStream("new.pdf"));
+		PdfWriter.getInstance(document, new FileOutputStream(edModel.getCaseNum().toString()+".pdf"));
 
 		// open document
 		document.open();
@@ -123,7 +143,7 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 		PdfPTable pdfPTable = new PdfPTable(2);
 
 		// First row in table
-		PdfPCell pdfPCell1 = new PdfPCell(new Paragraph("Case Number"));
+		PdfPCell pdfPCell1 = new PdfPCell(new Paragraph(edModel.getCaseNum().toString()+".pdf"));
 		PdfPCell pdfPCell2 = new PdfPCell(new Paragraph(edModel.getCaseNum().toString()));
 
 		// Add cells to table
@@ -168,7 +188,7 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 	public void buildPlanDnPdf(EligibilityDetailModel edModel) throws Exception {
 
 		Document document = new Document();
-		PdfWriter.getInstance(document, new FileOutputStream("new.pdf"));
+		PdfWriter.getInstance(document, new FileOutputStream("new2.pdf"));
 
 		// open document
 		document.open();
@@ -231,4 +251,25 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 		return model;
 	}
 
+	
+	public String storePdf(EligibilityDetailModel model) {
+		CoPdfModel pdfModel=null;
+		byte[] casePdf=null;
+		ClassPathResource pdfFile=null;
+		pdfModel=new CoPdfModel ();
+		try {
+			pdfFile = new ClassPathResource(model.getCaseNum().toString()+".pdf");
+			casePdf=new byte[(int) pdfFile.contentLength()];
+			pdfFile.getInputStream().read(casePdf);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		pdfModel.setCaseNumber(model.getCaseNum());
+		pdfModel.setPlanName(model.getPlanName());
+		pdfModel.setPlanStatus(model.getPlanStatus());
+		pdfModel.setPdfDocument(casePdf);
+		//call service class method
+		coTrgService.savePdf(pdfModel);
+		return model.getCaseNum().toString();
+	}
 }

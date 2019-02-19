@@ -3,13 +3,17 @@
  */
 package com.his.co.entity;
 
+import java.sql.Blob;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author vinay
@@ -17,6 +21,7 @@ import lombok.Data;
  */
 
 @Data()
+@RequiredArgsConstructor
 @Entity()
 @Table(name = "CO_PDFS")
 public class CoPdfEntity {
@@ -26,8 +31,9 @@ public class CoPdfEntity {
 	Integer coPdfId;
 	@Column(name = "CASE_NUMBER")
 	String caseNumber;
-	@Column(name = "PDF_DOCUMENT")
-	String pdfDocument;
+	 @Lob
+	@Column(name = "PDF_DOCUMENT", length=100000)
+	byte[] pdfDocument;
 	@Column(name = "PLAN_NAME")
 	String planName;
 	@Column(name = "PLAN_STATUS")

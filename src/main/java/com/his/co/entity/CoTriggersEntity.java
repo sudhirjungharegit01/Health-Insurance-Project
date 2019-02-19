@@ -1,6 +1,8 @@
 package com.his.co.entity;
 
-import java.util.Date;
+
+
+import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
