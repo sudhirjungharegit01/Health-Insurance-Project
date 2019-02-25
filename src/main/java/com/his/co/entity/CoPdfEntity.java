@@ -30,7 +30,7 @@ public class CoPdfEntity {
 	@Column(name = "CO_PDF_ID")
 	Integer coPdfId;
 	@Column(name = "CASE_NUMBER")
-	String caseNumber;
+	long caseNumber;
 	 @Lob
 	@Column(name = "PDF_DOCUMENT", length=100000)
 	byte[] pdfDocument;

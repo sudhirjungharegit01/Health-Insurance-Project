@@ -1,9 +1,17 @@
 package com.his.co.batches;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -62,7 +70,6 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 			String planStatus = edModel.getPlanStatus();
 
 			if (planStatus.equals(AppConstants.CASE_PLAN_STATUS)) {
-				System.out.println("success");
 				// generate approved pdf
 				try {
 					buildPlanApPdf(edModel);
@@ -98,14 +105,29 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 
 	@Override
 	public void start() {
+		ExecutorService service=null;
+		CompletionService<String> pool=null;
 		List<CoTriggersModel> models = coTrgService.findPendingTriggers();
 		if (!models.isEmpty()) {
 			TOTAL_TRGS = models.size();
+			service=Executors.newFixedThreadPool(40);
+			pool= new ExecutorCompletionService<String>(service);
+			
+			
 			// processing each trigger
 			for (CoTriggersModel model : models) {
 				try {
-					process(model);
-					SUCCESS_TRGS++;
+					/*pool.submit(new Callable<String>() {
+						
+						@Override
+						public String call() throws Exception {
+							// TODO Auto-generated method stub*/
+							process(model);
+							SUCCESS_TRGS++;
+							/*return null;
+						}
+					});*/
+					
 				} catch (Exception e) {
 					FAILURE_TRGS++;
 					e.printStackTrace();
@@ -188,7 +210,7 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 	public void buildPlanDnPdf(EligibilityDetailModel edModel) throws Exception {
 
 		Document document = new Document();
-		PdfWriter.getInstance(document, new FileOutputStream("new2.pdf"));
+		PdfWriter.getInstance(document, new FileOutputStream(edModel.getCaseNum().toString()+".pdf"));
 
 		// open document
 		document.open();
@@ -255,12 +277,11 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 	public String storePdf(EligibilityDetailModel model) {
 		CoPdfModel pdfModel=null;
 		byte[] casePdf=null;
-		ClassPathResource pdfFile=null;
+		FileInputStream pdfFile=null;
 		pdfModel=new CoPdfModel ();
 		try {
-			pdfFile = new ClassPathResource(model.getCaseNum().toString()+".pdf");
-			casePdf=new byte[(int) pdfFile.contentLength()];
-			pdfFile.getInputStream().read(casePdf);
+			pdfFile = new FileInputStream(model.getCaseNum().toString()+".pdf");
+			casePdf=toByteArrayUsingJava(pdfFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -272,4 +293,18 @@ public class CoPlanReportDlyBatch extends CoAbstractBatch {
 		coTrgService.savePdf(pdfModel);
 		return model.getCaseNum().toString();
 	}
+	
+	public byte[] toByteArrayUsingJava(InputStream is)
+		    throws IOException{
+		        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		        int reads = is.read();
+		       
+		        while(reads != -1){
+		            baos.write(reads);
+		            reads = is.read();
+		        }
+		      
+		        return baos.toByteArray();
+		       
+		    }
 }
